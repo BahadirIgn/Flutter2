@@ -17,7 +17,7 @@ class _DetailPortraitPageState extends State<DetailPortraitPage> {
     Future.delayed(const Duration(milliseconds: 300), () {
       if(!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const DetailPortraitRealPage()),
+        MaterialPageRoute(builder: (_) => const  DetailPortraitRealPage()),
       );
     });
   }

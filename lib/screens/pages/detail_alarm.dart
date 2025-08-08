@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/pages/real/saat/saat_main.dart';
-import 'real/saat/alarm/detail_alarm_real.dart'; // Gerçek içerik sayfası
+// Gerçek içerik sayfası
 
 class DetailAlarmPage extends StatefulWidget {
   const DetailAlarmPage({super.key});
