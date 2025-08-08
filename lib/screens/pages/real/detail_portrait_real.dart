@@ -2,8 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart'; // BURAYA DİKKAT
 import 'dart:convert';
-import 'package:image/image.dart' as img;
 
 class DetailPortraitRealPage extends StatefulWidget {
   const DetailPortraitRealPage({super.key});
@@ -21,15 +21,6 @@ class _DetailPortraitRealPageState extends State<DetailPortraitRealPage> {
   void initState() {
     super.initState();
     _fetchAllImages();
-  }
-
-  // JPEG'e dönüştürme fonksiyonu
-  Future<List<int>> convertToJpeg(Uint8List bytes) async {
-    final decodedImage = img.decodeImage(bytes);
-    if (decodedImage == null) {
-      throw Exception('Resim decode edilemedi!');
-    }
-    return img.encodeJpg(decodedImage, quality: 85);
   }
 
   Future<void> _fetchAllImages() async {
@@ -78,31 +69,25 @@ class _DetailPortraitRealPageState extends State<DetailPortraitRealPage> {
     return entity.thumbnailDataWithSize(ThumbnailSize(size, size));
   }
 
-  // Artık multipart değil, base64 JSON ile POST ediyor
   Future<void> _sendImageForPrediction(AssetEntity image) async {
     final bytes = await image.originBytes;
     if (bytes == null) return;
 
-    List<int> jpegBytes;
-    try {
-      jpegBytes = await convertToJpeg(bytes);
-    } catch (e) {
-      setState(() {
-        prediction = 'Resim dönüşümünde hata: $e';
-      });
-      return;
-    }
-
-    String base64Image = base64Encode(jpegBytes);
-
     var uri = Uri.parse('http://10.0.2.2:5000/predict');
+    var request = http.MultipartRequest('POST', uri);
+
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'image',
+        bytes,
+        filename: 'image.jpg',
+        contentType: MediaType('image', 'jpeg'),
+      ),
+    );
 
     try {
-      var response = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'image': base64Image}),
-      );
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
         var jsonResp = json.decode(response.body);

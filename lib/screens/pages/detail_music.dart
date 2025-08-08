@@ -17,7 +17,7 @@ class _DetailMusicPageState extends State<DetailMusicPage> {
     Future.delayed(const Duration(milliseconds: 300), () {
       if(!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const DetailMusicRealPage()),
+        MaterialPageRoute(builder: (_) => const DetailMusicReal()),
       );
     });
   }
